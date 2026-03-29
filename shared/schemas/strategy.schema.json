@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StrategyRules",
+  "type": "object",
+  "required": ["indicators", "entry", "exit"],
+  "properties": {
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name":   { "type": "string", "enum": ["rsi", "ema", "sma", "macd", "bbands", "atr"] },
+          "params": { "type": "object" }
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type":   { "type": "string" },
+        "value":  { "type": "number" },
+        "period": { "type": "integer" }
+      }
+    },
+    "exit": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type":   { "type": "string" },
+        "value":  { "type": "number" },
+        "period": { "type": "integer" }
+      }
+    },
+    "position_size_pct": { "type": "number", "minimum": 1, "maximum": 100 },
+    "description":        { "type": "string" }
+  }
+}

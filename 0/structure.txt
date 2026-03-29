@@ -1,0 +1,82 @@
+quantinel/
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml              # lint + test on every PR
+│       └── deploy.yml          # deploy on merge to main
+│
+├── frontend/                   # React + Vite
+│   ├── public/
+│   ├── src/
+│   │   ├── api/                # axios wrappers (strategyApi, dataApi)
+│   │   ├── components/
+│   │   │   ├── Chart/          # TradingView Lightweight Charts wrapper
+│   │   │   ├── StrategyInput/  # AI prompt input box
+│   │   │   ├── MetricsPanel/   # P&L, win rate, drawdown cards
+│   │   │   └── ui/             # shared buttons, modals, loaders
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Backtest.jsx
+│   │   │   └── Results.jsx
+│   │   ├── hooks/              # useBacktest, useStrategy
+│   │   ├── store/              # Zustand (global state)
+│   │   ├── utils/
+│   │   └── main.jsx
+│   ├── .env.example
+│   ├── package.json
+│   └── vite.config.js
+│
+├── gateway/                    # Node.js API layer
+│   ├── src/
+│   │   ├── routes/
+│   │   │   ├── strategy.js     # POST /api/strategy/parse
+│   │   │   ├── backtest.js     # POST /api/backtest/run
+│   │   │   └── data.js         # GET /api/data/ohlcv
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   ├── rateLimiter.js  # per-user rate limits
+│   │   │   └── errorHandler.js
+│   │   ├── services/
+│   │   │   ├── queueService.js # push jobs to BullMQ
+│   │   │   └── cacheService.js # Redis read/write
+│   │   └── app.js
+│   ├── .env.example
+│   └── package.json
+│
+├── engine/                     # Python backtesting core
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes.py       # FastAPI endpoints
+│   │   ├── backtest/
+│   │   │   ├── runner.py       # core backtest loop
+│   │   │   ├── indicators.py   # RSI, EMA, MACD etc (pandas-ta)
+│   │   │   ├── metrics.py      # P&L, win rate, max drawdown
+│   │   │   └── simulator.py    # trade simulation logic
+│   │   ├── data/
+│   │   │   ├── fetcher.py      # ccxt + Binance
+│   │   │   └── cache.py        # Redis OHLCV cache
+│   │   ├── parser/
+│   │   │   └── strategy_parser.py  # AI → structured rules (Phase 2)
+│   │   └── main.py
+│   ├── tests/
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── infra/
+│   ├── docker-compose.yml      # postgres, redis, gateway, engine, frontend
+│   ├── docker-compose.prod.yml
+│   └── k8s/                    # Kubernetes manifests (for scale)
+│       ├── gateway-deployment.yaml
+│       ├── engine-deployment.yaml (HPA enabled)
+│       ├── redis.yaml
+│       └── postgres.yaml
+│
+├── shared/                     # types / schemas shared across services
+│   └── schemas/
+│       ├── strategy.schema.json
+│       └── backtest_result.schema.json
+│
+├── .env.example                # root-level env template
+├── .gitignore
+├── README.md
+└── Makefile                    # make dev, make test, make build

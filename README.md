@@ -1,126 +1,125 @@
-## 🚀 Project: AI-Powered No-Code Trading Strategy Tester
+# Quantinel
 
-### 📌 Problem
-Most people have trading ideas but:
-- They don’t know coding
-- They can’t test strategies properly
-- Existing platforms are too complex or technical
+> AI-powered no-code trading strategy backtester. Describe your strategy in plain English — Quantinel converts it into logic, runs it on real crypto data, and shows you the results.
 
 ---
 
-### 💡 Solution
-We are building a platform where anyone can test trading strategies using simple English, without coding.
+## ⚡ Quick Start
 
-User can write:
-> “Buy when RSI < 30 and sell when RSI > 70”
+```bash
+# 1. Clone & enter
+git clone https://github.com/your-username/quantinel.git
+cd quantinel
 
-And the system will:
-1. Convert this into a trading strategy using AI  
-2. Run it on real market data (crypto initially)  
-3. Show results on a chart with detailed performance metrics  
+# 2. Set up environment
+cp .env.example .env
+# Edit .env — add your ANTHROPIC_API_KEY (required)
 
----
+# 3. Start everything
+make dev
+```
 
-### 🎯 Core Features (MVP)
-
-#### 1. AI Strategy Input
-- User types strategy in plain English
-- AI converts it into structured logic (rules)
-
-#### 2. Backtesting Engine
-- Runs strategy on historical crypto data
-- Simulates trades (buy/sell)
-- Tracks balance and performance
-
-#### 3. Chart Visualization
-- Candlestick chart
-- Buy/Sell markers on chart
-
-(Using TradingView Lightweight Charts)
-
-#### 4. Performance Metrics
-- Profit / Loss
-- Win rate
-- Max drawdown
-- Number of trades
+Then open:
+- **Frontend** → http://localhost:5173
+- **Gateway API** → http://localhost:3001
+- **Python Engine** → http://localhost:8000/docs
 
 ---
 
-### ⚙️ Tech Architecture
+## 🗂 Project Structure
 
-#### 🔹 Python Backend (Core Engine)
-- Strategy execution
-- Indicator calculations (RSI, EMA, etc.)
-- Backtesting logic
-
-#### 🔹 Node.js Backend
-- API layer
-- Handles requests from frontend
-- Sends strategy to Python engine
-
-#### 🔹 Frontend (Web App)
-- Input box for strategy
-- Chart display
-- Results dashboard
+```
+quantinel/
+├── frontend/      React + Vite (UI, chart, metrics)
+├── gateway/       Node.js + Express (API layer, auth, queue)
+├── engine/        Python + FastAPI (backtest, indicators, AI parser)
+├── infra/         Docker Compose + Kubernetes manifests
+├── shared/        JSON schemas shared across services
+└── .github/       CI/CD workflows
+```
 
 ---
 
-### 📊 Data Source
-Crypto market data using APIs (like Binance via ccxt)
+## 🧠 How It Works
 
-Reason:
-- Free & easy access
-- No restrictions like stock brokers
-
----
-
-### 🧠 Unique Point (Our Edge)
-Unlike platforms like TradingView or QuantConnect:
-- No coding required
-- AI converts idea → strategy
-- Beginner friendly
+1. **User types** a plain-English strategy (e.g. "Buy when RSI < 30, sell when RSI > 70")
+2. **AI Parser** (Claude) converts it into structured JSON rules
+3. **Backtest Engine** fetches historical OHLCV data from Binance, runs the strategy, simulates trades
+4. **Frontend** displays a candlestick chart with buy/sell markers + full performance metrics
 
 ---
 
-### 🛣️ Development Plan
+## 🔧 Services
 
-#### Phase 1 (MVP)
-- Fetch historical crypto data
-- Build simple backtesting engine
-- Add RSI-based strategy
-- Show results on chart
-
-#### Phase 2
-- Add AI strategy parsing
-- Support multiple indicators
-
-#### Phase 3
-- Live paper trading (real-time simulation)
-- Strategy comparison
+| Service   | Port | Stack                  |
+|-----------|------|------------------------|
+| Frontend  | 5173 | React, Vite, Tailwind  |
+| Gateway   | 3001 | Node.js, Express       |
+| Engine    | 8000 | Python, FastAPI        |
+| Redis     | 6379 | Job queue + OHLCV cache|
+| Postgres  | 5432 | User/strategy storage  |
 
 ---
 
-### ⚠️ Important Notes
-- This is NOT a real trading platform (no real money involved)
-- Only for simulation and learning
-- Accuracy depends on strategy quality
+## 📊 Supported Indicators
+
+- RSI (Relative Strength Index)
+- EMA (Exponential Moving Average)
+- SMA (Simple Moving Average)
+- MACD
+- Bollinger Bands
+- ATR (Average True Range)
 
 ---
 
-### 🎯 Goal
-Make trading strategy testing:
-- Simple
-- Fast
-- Accessible to non-technical users
+## 🔑 Environment Variables
+
+| Variable           | Required | Description                     |
+|--------------------|----------|---------------------------------|
+| `ANTHROPIC_API_KEY`| ✅       | For AI strategy parsing         |
+| `POSTGRES_USER`    | ✅       | Database user                   |
+| `POSTGRES_PASSWORD`| ✅       | Database password               |
+| `JWT_SECRET`       | ✅       | Change in production            |
+| `BINANCE_API_KEY`  | ❌       | Optional — public data works without |
 
 ---
 
-### 👥 What We Need
-- Backend dev (Python logic)
-- Frontend dev (UI + chart)
-- AI integration (strategy parsing)
+## 🧪 Running Tests
+
+```bash
+# Python engine tests
+cd engine && python -m pytest tests/ -v
+
+# Gateway lint
+cd gateway && npm run lint
+
+# Frontend lint
+cd frontend && npm run lint
+```
 
 ---
 
-### 🚀 Vision
-A platform where anyone can test ideas like a pro trader without writing a single line of cod
+## 🚀 Development Commands
+
+```bash
+make dev          # Start full stack (Docker)
+make dev-bg       # Start in background
+make stop         # Stop all containers
+make clean        # Stop + wipe volumes
+make logs         # Tail all logs
+make engine-local # Run engine without Docker
+```
+
+---
+
+## ⚠️ Disclaimer
+
+Quantinel is for **simulation and learning only**. No real money is ever involved. Past backtest results do not guarantee future performance.
+
+---
+
+## 🛣 Roadmap
+
+- [x] Phase 1 — RSI strategy, OHLCV data, chart, metrics
+- [ ] Phase 2 — AI strategy parsing, multi-indicator support
+- [ ] Phase 3 — Live paper trading, strategy comparison

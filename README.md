@@ -4,23 +4,33 @@
 
 ---
 
+## 📋 Prerequisites
+
+Make sure you have the following installed before getting started:
+
+| Requirement | Version | Notes |
+|---|---|---|
+| [Docker](https://docs.docker.com/get-docker/) | 24+ | Required to run all services |
+| [Docker Compose](https://docs.docker.com/compose/install/) | v2+ | Bundled with Docker Desktop |
+| Free Disk Space | ~2 GB | For Docker images and volumes |
+
+> **Docker Desktop** (Mac/Windows) includes both Docker and Docker Compose out of the box.
+
+---
+
 ## ⚡ Quick Start
 
 ```bash
-# 1. Clone & enter
-git clone https://github.com/your-username/quantinel.git
+# 1. Clone the repo
+git clone https://github.com/SohelPratap/quantinel.git
 cd quantinel
 
-# 2. Set up environment
-cp .env.example .env
-# Edit .env — add your ANTHROPIC_API_KEY (required)
-
-# 3. Start everything
+# 2. Start everything
 make dev
 ```
 
 Then open:
-- **Frontend** → http://localhost:5173
+- **Frontend** → http://localhost:3000
 - **Gateway API** → http://localhost:3001
 - **Python Engine** → http://localhost:8000/docs
 
@@ -53,7 +63,7 @@ quantinel/
 
 | Service   | Port | Stack                  |
 |-----------|------|------------------------|
-| Frontend  | 5173 | React, Vite, Tailwind  |
+| Frontend  | 3000 | React, Vite, Tailwind  |
 | Gateway   | 3001 | Node.js, Express       |
 | Engine    | 8000 | Python, FastAPI        |
 | Redis     | 6379 | Job queue + OHLCV cache|
@@ -69,18 +79,6 @@ quantinel/
 - MACD
 - Bollinger Bands
 - ATR (Average True Range)
-
----
-
-## 🔑 Environment Variables
-
-| Variable           | Required | Description                     |
-|--------------------|----------|---------------------------------|
-| `ANTHROPIC_API_KEY`| ✅       | For AI strategy parsing         |
-| `POSTGRES_USER`    | ✅       | Database user                   |
-| `POSTGRES_PASSWORD`| ✅       | Database password               |
-| `JWT_SECRET`       | ✅       | Change in production            |
-| `BINANCE_API_KEY`  | ❌       | Optional — public data works without |
 
 ---
 

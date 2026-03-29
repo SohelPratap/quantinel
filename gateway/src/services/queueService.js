@@ -1,7 +1,13 @@
 const { Queue, Worker } = require("bullmq");
 const axios = require("axios");
 
-const connection = { host: process.env.REDIS_HOST || "localhost", port: 6379 };
+const redisUrl = process.env.REDIS_URL
+  ? new URL(process.env.REDIS_URL)
+  : null;
+const connection = {
+  host: (redisUrl && redisUrl.hostname) || process.env.REDIS_HOST || "localhost",
+  port: (redisUrl && redisUrl.port ? parseInt(redisUrl.port, 10) : null) || parseInt(process.env.REDIS_PORT, 10) || 6379,
+};
 const ENGINE = process.env.ENGINE_URL || "http://localhost:8000";
 
 const backtestQueue = new Queue("backtest", { connection });

@@ -70,8 +70,10 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-quantinel}:${POSTGRES_PASSWORD:-secret}@postgres:5432/quantinel
       - ENGINE_URL=http://engine:8000
     depends_on:
-      - redis
-      - engine
+      redis:
+        condition: service_healthy
+      engine:
+        condition: service_started
     volumes:
       - ../gateway:/app
       - /app/node_modules

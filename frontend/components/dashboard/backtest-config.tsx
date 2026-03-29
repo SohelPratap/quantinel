@@ -25,7 +25,14 @@ const tradingPairs = [
 const timeframes = ["1m", "5m", "15m", "1h", "4h", "1D"]
 
 interface BacktestConfigProps {
-  onStartBacktest: () => void
+  onStartBacktest: (config: {
+    symbol: string
+    timeframe: string
+    start_date: string
+    end_date: string
+    initial_capital: number
+    position_size_pct: number
+  }) => void
   isRunning: boolean
 }
 
@@ -36,6 +43,17 @@ export function BacktestConfig({ onStartBacktest, isRunning }: BacktestConfigPro
   const [endDate, setEndDate] = useState("2024-03-01")
   const [capital, setCapital] = useState("10000")
   const [positionSize, setPositionSize] = useState("10")
+
+  const handleStart = () => {
+    onStartBacktest({
+      symbol: pair,
+      timeframe: timeframe.toLowerCase(),
+      start_date: startDate,
+      end_date: endDate,
+      initial_capital: parseFloat(capital) || 10000,
+      position_size_pct: parseFloat(positionSize) || 10,
+    })
+  }
 
   return (
     <div className="glass-panel rounded-xl p-4 h-full flex flex-col">
@@ -124,7 +142,7 @@ export function BacktestConfig({ onStartBacktest, isRunning }: BacktestConfigPro
       </div>
 
       <Button
-        onClick={onStartBacktest}
+        onClick={handleStart}
         disabled={isRunning}
         className="mt-4 w-full bg-[#06B6D4] hover:bg-[#06B6D4]/90 text-white"
       >

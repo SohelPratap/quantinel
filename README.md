@@ -27,9 +27,10 @@ Everything runs inside **Docker**, so the only things you need installed are:
 git clone https://github.com/SohelPratap/quantinel.git
 cd quantinel
 
-# 2. Copy the environment template and fill in your API key
+# 2. Create your .env file  (.env is NOT included in the repo — you must create it)
 cp .env.example .env
-# Open .env in any editor and set ANTHROPIC_API_KEY
+# Open .env in any editor and replace ANTHROPIC_API_KEY with your own key
+# Get a free key at: https://console.anthropic.com/
 
 # 3. Start everything
 make dev
@@ -54,7 +55,7 @@ If you have `make` installed (via [Chocolatey](https://chocolatey.org/): `choco 
 ```powershell
 git clone https://github.com/SohelPratap/quantinel.git
 cd quantinel
-copy .env.example .env          # then edit .env and add your ANTHROPIC_API_KEY
+copy .env.example .env   # creates your .env — then open it and set your ANTHROPIC_API_KEY
 make dev
 ```
 
@@ -65,7 +66,7 @@ Run the Docker Compose command directly — this is equivalent to `make dev`:
 ```powershell
 git clone https://github.com/SohelPratap/quantinel.git
 cd quantinel
-copy .env.example .env          # then edit .env and add your ANTHROPIC_API_KEY
+copy .env.example .env   # creates your .env — then open it and set your ANTHROPIC_API_KEY
 cd infra
 docker compose up --build
 ```
@@ -74,16 +75,18 @@ docker compose up --build
 
 ## 🔑 Environment Variables
 
-Copy `.env.example` to `.env` and fill in the values:
+**`.env` is not included in the repo.** You must create it yourself:
 
 ```bash
 cp .env.example .env   # Mac / Linux / Git Bash
 copy .env.example .env # Windows PowerShell
 ```
 
+Then open `.env` and fill in your own values — especially `ANTHROPIC_API_KEY`:
+
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | ✅ | Get it at https://console.anthropic.com/ |
+| `ANTHROPIC_API_KEY` | ✅ | **Your own key** — get it free at https://console.anthropic.com/ |
 | `POSTGRES_USER` | ✅ | Database username (default: `quantinel`) |
 | `POSTGRES_PASSWORD` | ✅ | Database password |
 | `JWT_SECRET` | ✅ | Random secret for auth tokens |

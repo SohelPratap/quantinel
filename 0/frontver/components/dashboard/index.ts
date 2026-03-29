@@ -1,0 +1,8 @@
+export { DashboardLayout } from "./dashboard-layout"
+export { TopNav } from "./top-nav"
+export { RightSidebar } from "./right-sidebar"
+export { AIStrategyPanel } from "./ai-strategy-panel"
+export { CodeEditorPanel } from "./code-editor-panel"
+export { TradingChart } from "./trading-chart"
+export { BacktestConfig } from "./backtest-config"
+export { BacktestResults } from "./backtest-results"

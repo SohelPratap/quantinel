@@ -2,58 +2,51 @@
 
 import { TrendingUp, Percent, Activity, TrendingDown, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { type BacktestData } from "@/lib/api"
 
 interface BacktestResultsProps {
-  hasResults: boolean
+  results?: BacktestData
 }
 
-const metrics = [
-  {
-    label: "Total Return",
-    value: "+24.8%",
-    change: "+$2,480",
-    icon: TrendingUp,
-    color: "text-[#10B981]",
-    bgColor: "bg-[#10B981]/20",
-  },
-  {
-    label: "Win Rate",
-    value: "68.5%",
-    change: "23/34 trades",
-    icon: Percent,
-    color: "text-[#3B82F6]",
-    bgColor: "bg-[#3B82F6]/20",
-  },
-  {
-    label: "Sharpe Ratio",
-    value: "1.85",
-    change: "Above avg",
-    icon: Activity,
-    color: "text-[#8B5CF6]",
-    bgColor: "bg-[#8B5CF6]/20",
-  },
-  {
-    label: "Max Drawdown",
-    value: "-8.2%",
-    change: "-$820",
-    icon: TrendingDown,
-    color: "text-[#EF4444]",
-    bgColor: "bg-[#EF4444]/20",
-  },
-]
+export function BacktestResults({ results }: BacktestResultsProps) {
+  const hasResults = !!results
 
-const tradeLogs = [
-  { time: "2024-01-15 09:32:00", action: "BUY", price: 42850.00, amount: 0.234, pnl: null },
-  { time: "2024-01-16 14:15:00", action: "SELL", price: 43520.00, amount: 0.234, pnl: "+$156.78" },
-  { time: "2024-01-18 11:45:00", action: "BUY", price: 43100.00, amount: 0.232, pnl: null },
-  { time: "2024-01-19 16:22:00", action: "SELL", price: 42800.00, amount: 0.232, pnl: "-$69.60" },
-  { time: "2024-01-22 08:10:00", action: "BUY", price: 41200.00, amount: 0.243, pnl: null },
-  { time: "2024-01-24 13:55:00", action: "SELL", price: 44100.00, amount: 0.243, pnl: "+$704.70" },
-  { time: "2024-01-28 10:30:00", action: "BUY", price: 43800.00, amount: 0.228, pnl: null },
-  { time: "2024-01-30 15:45:00", action: "SELL", price: 45200.00, amount: 0.228, pnl: "+$319.20" },
-]
-
-export function BacktestResults({ hasResults }: BacktestResultsProps) {
+  const metrics = results
+    ? [
+        {
+          label: "Total Return",
+          value: `${results.metrics.total_return_pct >= 0 ? "+" : ""}${results.metrics.total_return_pct.toFixed(2)}%`,
+          change: `${results.metrics.total_pnl >= 0 ? "+" : ""}$${Math.abs(results.metrics.total_pnl).toLocaleString()}`,
+          icon: TrendingUp,
+          color: results.metrics.total_return_pct >= 0 ? "text-[#10B981]" : "text-[#EF4444]",
+          bgColor: results.metrics.total_return_pct >= 0 ? "bg-[#10B981]/20" : "bg-[#EF4444]/20",
+        },
+        {
+          label: "Win Rate",
+          value: `${results.metrics.win_rate.toFixed(1)}%`,
+          change: `${results.metrics.winning_trades}/${results.metrics.total_trades} trades`,
+          icon: Percent,
+          color: "text-[#3B82F6]",
+          bgColor: "bg-[#3B82F6]/20",
+        },
+        {
+          label: "Sharpe Ratio",
+          value: results.metrics.sharpe_ratio.toFixed(2),
+          change: results.metrics.sharpe_ratio >= 1 ? "Above avg" : "Below avg",
+          icon: Activity,
+          color: "text-[#8B5CF6]",
+          bgColor: "bg-[#8B5CF6]/20",
+        },
+        {
+          label: "Max Drawdown",
+          value: `${results.metrics.max_drawdown_pct.toFixed(1)}%`,
+          change: `Final: $${results.metrics.final_capital.toLocaleString()}`,
+          icon: TrendingDown,
+          color: "text-[#EF4444]",
+          bgColor: "bg-[#EF4444]/20",
+        },
+      ]
+    : []
   return (
     <div className="glass-panel rounded-xl p-4 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-4">
@@ -117,40 +110,46 @@ export function BacktestResults({ hasResults }: BacktestResultsProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {tradeLogs.map((log, i) => (
-                    <tr key={i} className="border-b border-border/50 hover:bg-secondary/20">
-                      <td className="p-2 text-muted-foreground font-mono">{log.time}</td>
-                      <td className="p-2">
-                        <span
+                  {results!.trades.map((trade, i) => (
+                    <>
+                      <tr key={`buy-${i}`} className="border-b border-border/50 hover:bg-secondary/20">
+                        <td className="p-2 text-muted-foreground font-mono">{trade.entry_time}</td>
+                        <td className="p-2">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#10B981]/20 text-[#10B981]">
+                            BUY
+                          </span>
+                        </td>
+                        <td className="p-2 text-right font-mono text-foreground">
+                          ${trade.entry_price.toLocaleString()}
+                        </td>
+                        <td className="p-2 text-right font-mono text-foreground">
+                          {trade.qty.toFixed(4)}
+                        </td>
+                        <td className="p-2 text-right font-mono text-muted-foreground">—</td>
+                      </tr>
+                      <tr key={`sell-${i}`} className="border-b border-border/50 hover:bg-secondary/20">
+                        <td className="p-2 text-muted-foreground font-mono">{trade.exit_time}</td>
+                        <td className="p-2">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#EF4444]/20 text-[#EF4444]">
+                            SELL
+                          </span>
+                        </td>
+                        <td className="p-2 text-right font-mono text-foreground">
+                          ${trade.exit_price.toLocaleString()}
+                        </td>
+                        <td className="p-2 text-right font-mono text-foreground">
+                          {trade.qty.toFixed(4)}
+                        </td>
+                        <td
                           className={cn(
-                            "px-1.5 py-0.5 rounded text-[10px] font-medium",
-                            log.action === "BUY"
-                              ? "bg-[#10B981]/20 text-[#10B981]"
-                              : "bg-[#EF4444]/20 text-[#EF4444]"
+                            "p-2 text-right font-mono",
+                            trade.pnl >= 0 ? "text-[#10B981]" : "text-[#EF4444]"
                           )}
                         >
-                          {log.action}
-                        </span>
-                      </td>
-                      <td className="p-2 text-right font-mono text-foreground">
-                        ${log.price.toLocaleString()}
-                      </td>
-                      <td className="p-2 text-right font-mono text-foreground">
-                        {log.amount}
-                      </td>
-                      <td
-                        className={cn(
-                          "p-2 text-right font-mono",
-                          log.pnl?.startsWith("+")
-                            ? "text-[#10B981]"
-                            : log.pnl?.startsWith("-")
-                            ? "text-[#EF4444]"
-                            : "text-muted-foreground"
-                        )}
-                      >
-                        {log.pnl || "—"}
-                      </td>
-                    </tr>
+                          {trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(2)}
+                        </td>
+                      </tr>
+                    </>
                   ))}
                 </tbody>
               </table>

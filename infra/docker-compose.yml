@@ -69,6 +69,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://${POSTGRES_USER:-quantinel}:${POSTGRES_PASSWORD:-secret}@postgres:5432/quantinel
       - ENGINE_URL=http://engine:8000
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       redis:
         condition: service_healthy
@@ -85,15 +86,15 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_GATEWAY_URL=http://localhost:3001
     depends_on:
       - gateway
     volumes:
       - ../frontend:/app
       - /app/node_modules
-    command: npm run dev -- --host
+    command: npm run dev
 
 volumes:
   postgres_data:

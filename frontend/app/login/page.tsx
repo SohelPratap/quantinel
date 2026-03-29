@@ -4,9 +4,11 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Activity, Eye, EyeOff, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { api, saveToken } from "@/lib/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,9 +20,15 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    router.push("/")
+    try {
+      const { token } = await api.auth.login(email, password)
+      saveToken(token)
+      router.push("/")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Login failed")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

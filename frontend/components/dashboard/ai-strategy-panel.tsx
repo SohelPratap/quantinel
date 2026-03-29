@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import { Sparkles, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { api, type StrategyRules } from "@/lib/api"
 
 interface AIStrategyPanelProps {
-  onGenerate: (strategy: string) => void
+  onGenerate: (rules: StrategyRules) => void
 }
 
 export function AIStrategyPanel({ onGenerate }: AIStrategyPanelProps) {
@@ -17,10 +19,19 @@ export function AIStrategyPanel({ onGenerate }: AIStrategyPanelProps) {
     if (!prompt.trim()) return
 
     setIsGenerating(true)
-    // Simulate AI generation
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    onGenerate(prompt)
-    setIsGenerating(false)
+    try {
+      const { rules } = await api.strategy.parse(prompt)
+      if (rules.error) {
+        toast.error(rules.error)
+        return
+      }
+      onGenerate(rules)
+      toast.success("Strategy generated!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to generate strategy")
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   return (

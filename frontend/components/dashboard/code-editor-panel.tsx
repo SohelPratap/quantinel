@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Play, CheckCircle, Code2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -87,15 +87,66 @@ strategy = CustomStrategy()
 # strategy.set_stop_loss(0.02)
 # strategy.set_take_profit(0.05)`
 
+import { type StrategyRules } from "@/lib/api"
+
+function rulesToPythonCode(rules: StrategyRules): string {
+  const indicators = rules.indicators
+    .map((ind) => {
+      const params = Object.entries(ind.params)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(", ")
+      return `        # ${ind.name.toUpperCase()}(${params})`
+    })
+    .join("\n")
+
+  const entryComment = `entry: ${rules.entry.type} (value=${rules.entry.value}${rules.entry.period ? `, period=${rules.entry.period}` : ""})`
+  const exitComment = `exit:  ${rules.exit.type} (value=${rules.exit.value}${rules.exit.period ? `, period=${rules.exit.period}` : ""})`
+
+  return `# AI Generated Strategy
+# ${rules.description ?? "Custom strategy"}
+import pandas as pd
+import numpy as np
+from quantinel import Strategy, Signal
+
+class AIGeneratedStrategy(Strategy):
+    """
+    ${rules.description ?? "AI-generated trading strategy"}
+    
+    ${entryComment}
+    ${exitComment}
+    Position size: ${rules.position_size_pct}%
+    """
+
+    def __init__(self):
+        # Indicators
+${indicators || "        pass"}
+
+    def generate_signals(self, df):
+        # Entry condition: ${rules.entry.type} = ${rules.entry.value}
+        # Exit  condition: ${rules.exit.type} = ${rules.exit.value}
+        return df
+
+strategy = AIGeneratedStrategy()
+strategy.set_position_size(${rules.position_size_pct})
+`
+}
+
 interface CodeEditorPanelProps {
-  generatedCode?: string
+  strategyRules?: StrategyRules
   onRun: () => void
 }
 
-export function CodeEditorPanel({ generatedCode, onRun }: CodeEditorPanelProps) {
+export function CodeEditorPanel({ strategyRules, onRun }: CodeEditorPanelProps) {
   const [activeTab, setActiveTab] = useState("ai")
-  const [aiCode, setAiCode] = useState(generatedCode || defaultAICode)
+  const [aiCode, setAiCode] = useState(defaultAICode)
   const [manualCode, setManualCode] = useState(defaultManualCode)
+
+  useEffect(() => {
+    if (strategyRules) {
+      setAiCode(rulesToPythonCode(strategyRules))
+      setActiveTab("ai")
+    }
+  }, [strategyRules])
 
   return (
     <div className="glass-panel rounded-xl p-4 h-full flex flex-col">

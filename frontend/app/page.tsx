@@ -1,31 +1,57 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { AIStrategyPanel } from "@/components/dashboard/ai-strategy-panel"
 import { CodeEditorPanel } from "@/components/dashboard/code-editor-panel"
 import { TradingChart } from "@/components/dashboard/trading-chart"
 import { BacktestConfig } from "@/components/dashboard/backtest-config"
 import { BacktestResults } from "@/components/dashboard/backtest-results"
+import { api, type StrategyRules, type BacktestData } from "@/lib/api"
 
 export default function DashboardPage() {
-  const [hasResults, setHasResults] = useState(false)
+  const [strategyRules, setStrategyRules] = useState<StrategyRules | undefined>()
+  const [backtestResults, setBacktestResults] = useState<BacktestData | undefined>()
   const [isBacktesting, setIsBacktesting] = useState(false)
 
-  const handleGenerateStrategy = (prompt: string) => {
-    console.log("[v0] Strategy generated with prompt:", prompt)
+  const handleGenerateStrategy = (rules: StrategyRules) => {
+    setStrategyRules(rules)
   }
 
   const handleRunCode = () => {
-    console.log("[v0] Running strategy code")
+    toast.info("Use the Backtest Settings below to run a full backtest.")
   }
 
-  const handleStartBacktest = async () => {
+  const handleStartBacktest = async (config: {
+    symbol: string
+    timeframe: string
+    start_date: string
+    end_date: string
+    initial_capital: number
+    position_size_pct: number
+  }) => {
+    if (!strategyRules) {
+      toast.error("Generate a strategy first using the AI Strategy Generator.")
+      return
+    }
+
     setIsBacktesting(true)
-    // Simulate backtest
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setHasResults(true)
-    setIsBacktesting(false)
+    try {
+      const { data } = await api.backtest.run({
+        ...config,
+        strategy_rules: {
+          ...strategyRules,
+          position_size_pct: config.position_size_pct,
+        },
+      })
+      setBacktestResults(data)
+      toast.success(`Backtest complete — ${data.metrics.total_trades} trades executed.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Backtest failed")
+    } finally {
+      setIsBacktesting(false)
+    }
   }
 
   return (
@@ -34,7 +60,7 @@ export default function DashboardPage() {
         {/* Top Section - 3 columns */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[380px]">
           <AIStrategyPanel onGenerate={handleGenerateStrategy} />
-          <CodeEditorPanel onRun={handleRunCode} />
+          <CodeEditorPanel strategyRules={strategyRules} onRun={handleRunCode} />
           <TradingChart />
         </div>
 
@@ -44,7 +70,7 @@ export default function DashboardPage() {
             onStartBacktest={handleStartBacktest}
             isRunning={isBacktesting}
           />
-          <BacktestResults hasResults={hasResults} />
+          <BacktestResults results={backtestResults} />
         </div>
       </div>
     </DashboardLayout>

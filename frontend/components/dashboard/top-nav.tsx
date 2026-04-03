@@ -22,13 +22,6 @@ export function TopNav() {
       </Link>
 
       <div className="flex items-center gap-6">
-        <Link
-          href="/pricing"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Pricing
-        </Link>
-
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
             <Avatar className="h-8 w-8">

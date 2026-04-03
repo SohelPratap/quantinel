@@ -125,7 +125,10 @@ export default function NormalStrategyGenPage() {
                   placeholder="10000"
                   className="pl-8 bg-secondary/50 border-border text-foreground"
                   value={capital}
-                  onChange={(e) => setCapital(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (v === "" || (Number(v) >= 0 && !isNaN(Number(v)))) setCapital(v)
+                  }}
                   type="number"
                   min="0"
                 />
@@ -141,7 +144,10 @@ export default function NormalStrategyGenPage() {
                   placeholder="2"
                   className="pl-8 bg-secondary/50 border-border text-foreground"
                   value={risk}
-                  onChange={(e) => setRisk(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (v === "" || (Number(v) >= 0 && Number(v) <= 100 && !isNaN(Number(v)))) setRisk(v)
+                  }}
                   type="number"
                   min="0"
                   max="100"

@@ -2,43 +2,85 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, History, Settings } from "lucide-react"
+import {
+  LayoutDashboard,
+  History,
+  Settings,
+  FlaskConical,
+  Wand2,
+  Brain,
+  PlayCircle,
+  Zap,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const navItems = [
+const coreNavItems = [
   { icon: LayoutDashboard, href: "/", label: "Dashboard" },
   { icon: History, href: "/history", label: "History" },
   { icon: Settings, href: "/settings", label: "Settings" },
 ]
 
+const tradingModeItems = [
+  { icon: FlaskConical, href: "/backtesting", label: "Backtesting Suite" },
+  { icon: Wand2, href: "/strategy-gen/normal", label: "Normal Strategy Generation" },
+  { icon: Brain, href: "/strategy-gen/adaptive", label: "Adaptive Strategy Generation" },
+  { icon: PlayCircle, href: "/paper/standard", label: "Paper Trading" },
+  { icon: Zap, href: "/paper/adaptive", label: "Adaptive Paper Trading" },
+]
+
+function NavItem({ icon: Icon, href, label, isActive }: {
+  icon: React.ElementType
+  href: string
+  label: string
+  isActive: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover-glow",
+        isActive
+          ? "bg-primary/20 text-primary"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+      )}
+      title={label}
+    >
+      <Icon className="w-5 h-5" />
+    </Link>
+  )
+}
+
 export function RightSidebar() {
   const pathname = usePathname()
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/"
+    return pathname.startsWith(href)
+  }
 
   return (
     <aside className="w-16 border-l border-border bg-card/50 flex flex-col items-center py-4 relative">
       <nav className="flex flex-col gap-2">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || 
-            (item.href === "/history" && pathname.startsWith("/history")) ||
-            (item.href === "/settings" && pathname.startsWith("/settings"))
+        {coreNavItems.map((item) => (
+          <NavItem
+            key={item.href}
+            {...item}
+            isActive={isActive(item.href)}
+          />
+        ))}
+      </nav>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover-glow",
-                isActive
-                  ? "bg-primary/20 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              )}
-              title={item.label}
-            >
-              <Icon className="w-5 h-5" />
-            </Link>
-          )
-        })}
+      {/* Separator */}
+      <div className="w-8 my-3 border-t border-border/60" />
+
+      <nav className="flex flex-col gap-2">
+        {tradingModeItems.map((item) => (
+          <NavItem
+            key={item.href}
+            {...item}
+            isActive={isActive(item.href)}
+          />
+        ))}
       </nav>
 
       {/* Vertical rotated label */}
